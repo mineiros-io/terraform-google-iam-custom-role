@@ -3,19 +3,16 @@
 [![Build Status](https://github.com/mineiros-io/terraform-google-iam-custom-role/workflows/Tests/badge.svg)](https://github.com/mineiros-io/terraform-google-iam-custom-role/actions)
 [![GitHub tag (latest SemVer)](https://img.shields.io/github/v/tag/mineiros-io/terraform-google-iam-custom-role.svg?label=latest&sort=semver)](https://github.com/mineiros-io/terraform-google-iam-custom-role/releases)
 [![Terraform Version](https://img.shields.io/badge/Terraform-1.x-623CE4.svg?logo=terraform)](https://github.com/hashicorp/terraform/releases)
-[![AWS Provider Version](https://img.shields.io/badge/AWS-3-F8991D.svg?logo=terraform)](https://github.com/terraform-providers/terraform-provider-aws/releases)
+[![Google Provider Version](https://img.shields.io/badge/google-4-1A73E8.svg?logo=terraform)](https://github.com/terraform-providers/terraform-provider-google/releases)
 [![Join Slack](https://img.shields.io/badge/slack-@mineiros--community-f32752.svg?logo=slack)](https://mineiros.io/slack)
 
 # terraform-google-iam-custom-role
 
-A [Terraform] module for [Amazon Web Services (AWS)][aws].
+A [Terraform][terraform] module to create [Google Project IAM custom role][google-project-iam-custom-roles] and [Google Organization IAM custom role][google-organization-iam-custom-role] on [Google Cloud Services (GCP)][gcp].
 
-**_This module supports Terraform version 1
-and is compatible with the Terraform AWS Provider version 3._**
+**_This module supports Terraform version 1 and is compatible with the Terraform Google Provider version 4._**
 
-This module is part of our Infrastructure as Code (IaC) framework
-that enables our users and customers to easily deploy and manage reusable,
-secure, and production-grade cloud infrastructure.
+This module is part of our Infrastructure as Code (IaC) framework that enables our users and customers to easily deploy and manage reusable secure, and production-grade cloud infrastructure.
 
 
 - [Module Features](#module-features)
@@ -25,8 +22,7 @@ secure, and production-grade cloud infrastructure.
   - [Module Configuration](#module-configuration)
 - [Module Outputs](#module-outputs)
 - [External Documentation](#external-documentation)
-  - [AWS Documentation IAM](#aws-documentation-iam)
-  - [Terraform AWS Provider Documentation](#terraform-aws-provider-documentation)
+  - [Google Cloud Documentation:](#google-cloud-documentation)
 - [Module Versioning](#module-versioning)
   - [Backwards compatibility in `0.0.z` and `0.y.z` version](#backwards-compatibility-in-00z-and-0yz-version)
 - [About Mineiros](#about-mineiros)
@@ -37,13 +33,10 @@ secure, and production-grade cloud infrastructure.
 
 ## Module Features
 
-This module implements the following Terraform resources
+This module allows the management of customized Cloud IAM project and organization roles through the following Terraform resources:
 
-- `null_resource`
-
-and supports additional features of the following modules:
-
-- [mineiros-io/something/google](https://github.com/mineiros-io/terraform-google-something)
+- `google_organization_iam_custom_role`
+- `google_project_iam_custom_role`
 
 ## Getting Started
 
@@ -51,7 +44,14 @@ Most common usage of the module:
 
 ```hcl
 module "terraform-google-iam-custom-role" {
-  source = "git@github.com:mineiros-io/terraform-google-iam-custom-role.git?ref=v0.0.1"
+  source      = "git@github.com:mineiros-io/terraform-google-iam-custom-role.git?ref=v0.0.1"
+
+  role_id     = "myCustomRole"
+  title       = "My Custom Role"
+  description = "A description"
+  permissions = ["iam.roles.list", "iam.roles.create", "iam.roles.delete"]
+
+  org_id = "1234567"
 }
 ```
 
@@ -61,40 +61,44 @@ See [variables.tf] and [examples/] for details and use-cases.
 
 ### Main Resource Configuration
 
-- [**`example_required`**](#var-example_required): *(**Required** `string`)*<a name="var-example_required"></a>
+- [**`role_id`**](#var-role_id): *(**Required** `string`)*<a name="var-role_id"></a>
 
-  The name of the resource
+  The camelCaseRoleId to use for this role. Cannot contain `-` characters.
 
-- [**`example_name`**](#var-example_name): *(Optional `string`)*<a name="var-example_name"></a>
+- [**`title`**](#var-title): *(**Required** `string`)*<a name="var-title"></a>
 
-  The name of the resource
+  A human-readable title for the role.
 
-  Default is `"optional-resource-name"`.
+- [**`permissions`**](#var-permissions): *(**Required** `set(string)`)*<a name="var-permissions"></a>
 
-- [**`example_user_object`**](#var-example_user_object): *(Optional `object(user)`)*<a name="var-example_user_object"></a>
+  The names of the permissions this role grants when bound in an IAM policy. At least one permission must be specified.
 
-  Default is `{}`.
+- [**`org_id`**](#var-org_id): *(Optional `string`)*<a name="var-org_id"></a>
 
-  Example:
+  The numeric ID of the organization in which you want to create a custom role.
 
-  ```hcl
-  user = {
-    name        = "marius"
-    description = "The guy from Berlin."
-  }
-  ```
+- [**`stage`**](#var-stage): *(Optional `string`)*<a name="var-stage"></a>
 
-  The `user` object accepts the following attributes:
+  The current launch stage of the role.
 
-  - [**`name`**](#attr-example_user_object-name): *(**Required** `string`)*<a name="attr-example_user_object-name"></a>
+  The possible values are:
 
-    The name of the user
+   - `ALPHA`: The user has indicated this role is currently in an Alpha phase. If this launch stage is selected, the stage field will not be included when requesting the definition for a given role.
+   - `BETA`: The user has indicated this role is currently in a Beta phase.
+   - `GA`: The user has indicated this role is generally available.
+   - `DEPRECATED`: The user has indicated this role is being deprecated.
+   - `DISABLED`: This role is disabled and will not contribute permissions to any principals it is granted to in policies.
+   - `EAP`: The user has indicated this role is currently in an EAP phase.
 
-  - [**`description`**](#attr-example_user_object-description): *(Optional `string`)*<a name="attr-example_user_object-description"></a>
+  Default is `"GA"`.
 
-    A description describng the user in more detail
+- [**`description`**](#var-description): *(Optional `string`)*<a name="var-description"></a>
 
-    Default is `""`.
+  A human-readable description for the role.
+
+- [**`projects`**](#var-projects): *(Optional `set(string)`)*<a name="var-projects"></a>
+
+  A set of projects that the custom role will be created in.
 
 ### Module Configuration
 
@@ -103,55 +107,6 @@ See [variables.tf] and [examples/] for details and use-cases.
   Specifies whether resources in the module will be created.
 
   Default is `true`.
-
-- [**`module_tags`**](#var-module_tags): *(Optional `map(string)`)*<a name="var-module_tags"></a>
-
-  A map of tags that will be applied to all created resources that accept tags.
-  Tags defined with `module_tags` can be overwritten by resource-specific tags.
-
-  Default is `{}`.
-
-  Example:
-
-  ```hcl
-  module_tags = {
-    environment = "staging"
-    team        = "platform"
-  }
-  ```
-
-- [**`module_timeouts`**](#var-module_timeouts): *(Optional `map(timeout)`)*<a name="var-module_timeouts"></a>
-
-  A map of timeout objects that is keyed by Terraform resource name
-  defining timeouts for `create`, `update` and `delete` Terraform operations.
-
-  Supported resources are: `null_resource`, ...
-
-  Example:
-
-  ```hcl
-  module_timeouts = {
-    null_resource = {
-      create = "4m"
-      update = "4m"
-      delete = "4m"
-    }
-  }
-  ```
-
-  Each `timeout` object in the map accepts the following attributes:
-
-  - [**`create`**](#attr-module_timeouts-create): *(Optional `string`)*<a name="attr-module_timeouts-create"></a>
-
-    Timeout for create operations.
-
-  - [**`update`**](#attr-module_timeouts-update): *(Optional `string`)*<a name="attr-module_timeouts-update"></a>
-
-    Timeout for update operations.
-
-  - [**`delete`**](#attr-module_timeouts-delete): *(Optional `string`)*<a name="attr-module_timeouts-delete"></a>
-
-    Timeout for delete operations.
 
 - [**`module_depends_on`**](#var-module_depends_on): *(Optional `list(dependency)`)*<a name="var-module_depends_on"></a>
 
@@ -172,28 +127,24 @@ See [variables.tf] and [examples/] for details and use-cases.
 
 The following attributes are exported in the outputs of the module:
 
+- [**`google_project_iam_custom_roles`**](#output-google_project_iam_custom_roles): *(`list(google_project_iam_custom_role)`)*<a name="output-google_project_iam_custom_roles"></a>
+
+  A map of outputs of the created google_project_iam_custom_role resources.
+
+- [**`google_organization_iam_custom_role`**](#output-google_organization_iam_custom_role): *(`object(google_organization_iam_custom_role)`)*<a name="output-google_organization_iam_custom_role"></a>
+
+  A map of outputs of the created google_organization_iam_custom_role resource.
+
 - [**`module_enabled`**](#output-module_enabled): *(`bool`)*<a name="output-module_enabled"></a>
 
   Whether this module is enabled.
 
-- [**`module_tags`**](#output-module_tags): *(`map(string)`)*<a name="output-module_tags"></a>
-
-  The map of tags that are being applied to all created resources that accept tags.
-
 ## External Documentation
 
-### AWS Documentation IAM
+### Google Cloud Documentation:
 
-- https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html
-- https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies.html
-- https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html
-
-### Terraform AWS Provider Documentation
-
-- https://www.terraform.io/docs/providers/aws/r/iam_role.html
-- https://www.terraform.io/docs/providers/aws/r/iam_role_policy.html
-- https://www.terraform.io/docs/providers/aws/r/iam_role_policy_attachment.html
-- https://www.terraform.io/docs/providers/aws/r/iam_instance_profile.html
+- IAM Custom Roles: https://cloud.google.com/iam/docs/understanding-custom-roles
+- IAM API: https://cloud.google.com/iam/docs/reference/rest/v1/projects.roles
 
 ## Module Versioning
 
@@ -252,11 +203,9 @@ Copyright &copy; 2020-2022 [Mineiros GmbH][homepage]
 [hello@mineiros.io]: mailto:hello@mineiros.io
 [badge-license]: https://img.shields.io/badge/license-Apache%202.0-brightgreen.svg
 [releases-terraform]: https://github.com/hashicorp/terraform/releases
-[releases-aws-provider]: https://github.com/terraform-providers/terraform-provider-aws/releases
 [apache20]: https://opensource.org/licenses/Apache-2.0
 [slack]: https://mineiros.io/slack
 [terraform]: https://www.terraform.io
-[aws]: https://aws.amazon.com/
 [semantic versioning (semver)]: https://semver.org/
 [variables.tf]: https://github.com/mineiros-io/terraform-google-iam-custom-role/blob/main/variables.tf
 [examples/]: https://github.com/mineiros-io/terraform-google-iam-custom-role/blob/main/examples
@@ -265,3 +214,6 @@ Copyright &copy; 2020-2022 [Mineiros GmbH][homepage]
 [makefile]: https://github.com/mineiros-io/terraform-google-iam-custom-role/blob/main/Makefile
 [pull requests]: https://github.com/mineiros-io/terraform-google-iam-custom-role/pulls
 [contribution guidelines]: https://github.com/mineiros-io/terraform-google-iam-custom-role/blob/main/CONTRIBUTING.md
+[google-project-iam-custom-roles]: https://cloud.google.com/iam/docs/understanding-custom-roles
+[google-organization-iam-custom-role]: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/google_organization_iam_custom_role
+[gcp]: https://cloud.google.com/

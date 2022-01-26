@@ -1,6 +1,7 @@
 package test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/terraform"
@@ -12,7 +13,8 @@ func TestUnitComplete(t *testing.T) {
 	terraformOptions := &terraform.Options{
 		TerraformDir: "unit-complete",
 		Vars: map[string]interface{}{
-			"aws_region": "us-east-1",
+			"gcp_project": os.Getenv("TF_VAR_GCP_PROJECT"),
+			"gcp_region":  "europe-west3",
 		},
 		Upgrade: true,
 	}
