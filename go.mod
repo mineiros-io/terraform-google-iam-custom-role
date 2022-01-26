@@ -1,4 +1,4 @@
-module github.com/mineiros-io/terraform-module-template
+module github.com/mineiros-io/terraform-google-iam-custom-role
 
 go 1.14
 
