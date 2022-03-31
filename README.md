@@ -47,7 +47,7 @@ Most common usage of the module:
 
 ```hcl
 module "terraform-google-iam-custom-role" {
-  source      = "git@github.com:mineiros-io/terraform-google-iam-custom-role.git?ref=v0.0.1"
+  source      = "github.com/mineiros-io/terraform-google-iam-custom-role?ref=v0.0.2"
 
   role_id     = "myCustomRole"
   title       = "My Custom Role"
