@@ -41,5 +41,4 @@ module "test" {
   permissions = ["iam.roles.list", "iam.roles.create", "iam.roles.delete"]
 
   org_id = "1234566"
-  # TODO: add `projects` here?
 }
