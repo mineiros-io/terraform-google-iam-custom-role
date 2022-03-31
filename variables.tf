@@ -13,16 +13,6 @@ variable "title" {
   type        = string
 }
 
-variable "permissions" {
-  description = "(Required) The names of the permissions this role grants when bound in an IAM policy. At least one permission must be specified."
-  type        = set(string)
-
-  validation {
-    condition     = length(var.permissions) >= 1
-    error_message = "At least one 'permission' must be specified."
-  }
-}
-
 # ----------------------------------------------------------------------------------------------------------------------
 # OPTIONAL PARAMETERS
 # These variables have defaults, but may be overridden.
@@ -59,6 +49,18 @@ variable "description" {
 
 variable "projects" {
   description = "(Optional) A set of projects that the custom role will be created in."
+  type        = set(string)
+  default     = []
+}
+
+variable "permissions" {
+  description = "(Optional) The names of the permissions this role grants when bound in an IAM policy. At least one permission must be specified."
+  type        = set(string)
+  default     = []
+}
+
+variable "permissions_from_roles" {
+  description = "(Optional) The names of the roles to have the permissions cloned from."
   type        = set(string)
   default     = []
 }

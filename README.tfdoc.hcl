@@ -110,6 +110,12 @@ section {
         required    = true
       }
 
+      variable "permissions_from_roles" {
+        description = "The names of the roles to have the permissions cloned from."
+        type        = set(string)
+        default     = []
+      }
+
       variable "org_id" {
         description = "The numeric ID of the organization in which you want to create a custom role."
         type        = string

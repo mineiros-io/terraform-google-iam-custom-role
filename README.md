@@ -73,6 +73,12 @@ See [variables.tf] and [examples/] for details and use-cases.
 
   The names of the permissions this role grants when bound in an IAM policy. At least one permission must be specified.
 
+- [**`permissions_from_roles`**](#var-permissions_from_roles): *(Optional `set(string)`)*<a name="var-permissions_from_roles"></a>
+
+  The names of the roles to have the permissions cloned from.
+
+  Default is `[]`.
+
 - [**`org_id`**](#var-org_id): *(Optional `string`)*<a name="var-org_id"></a>
 
   The numeric ID of the organization in which you want to create a custom role.
