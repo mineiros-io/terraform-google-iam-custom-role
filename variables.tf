@@ -4,23 +4,13 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 variable "role_id" {
-  description = "(Required) The camel case role id to use for this role. Cannot contain - characters."
   type        = string
+  description = "(Required) The camel case role id to use for this role. Cannot contain - characters."
 }
 
 variable "title" {
-  description = "(Required) A human-readable title for the role."
   type        = string
-}
-
-variable "permissions" {
-  description = "(Required) The names of the permissions this role grants when bound in an IAM policy. At least one permission must be specified."
-  type        = set(string)
-
-  validation {
-    condition     = length(var.permissions) >= 1
-    error_message = "At least one 'permission' must be specified."
-  }
+  description = "(Required) A human-readable title for the role."
 }
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -29,12 +19,19 @@ variable "permissions" {
 # ----------------------------------------------------------------------------------------------------------------------
 
 variable "org_id" {
-  description = "(Optional) The numeric ID of the organization in which you want to create a custom role."
+  description = "(Optional) The numeric ID of the organization in which you want to create a custom role. Conflicts with `var.project`."
   type        = string
   default     = null
 }
 
+variable "project" {
+  type        = string
+  description = "(Optional) The project that the service account will be created in. Ignored if `var.org_id` is set. Defaults to the provider project configuration."
+  default     = null
+}
+
 variable "stage" {
+  type        = string
   description = <<-EOF
     (Optional) The current launch stage of the role. Defaults to GA.
 
@@ -47,19 +44,24 @@ variable "stage" {
     - `DISABLED`: This role is disabled and will not contribute permissions to any principals it is granted to in policies.
     - `EAP`: The user has indicated this role is currently in an EAP phase.
   EOF
-  type        = string
   default     = "GA"
 }
+
 variable "description" {
-  description = "(Optional) A human-readable description for the role."
   type        = string
+  description = "(Optional) A human-readable description for the role."
   default     = null
 }
 
-
-variable "projects" {
-  description = "(Optional) A set of projects that the custom role will be created in."
+variable "permissions" {
   type        = set(string)
+  description = "(Optional) The names of the permissions this role grants when bound in an IAM policy. At least one permission must be specified."
+  default     = []
+}
+
+variable "permissions_from_roles" {
+  type        = set(string)
+  description = "(Optional) The names of the roles to have the permissions cloned from."
   default     = []
 }
 

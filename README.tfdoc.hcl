@@ -20,14 +20,6 @@ header {
     text  = "Terraform Version"
   }
 
-  # TODO: remove and enable gh or gcp provider badge
-
-  # badge "tf-gh" {
-  #   image = "https://img.shields.io/badge/GH-4-F8991D.svg?logo=terraform"
-  #   url = "https://github.com/terraform-providers/terraform-provider-github/releases"
-  #   text = "Github Provider Version"
-  # }
-
   badge "tf-gcp-provider" {
     image = "https://img.shields.io/badge/google-4-1A73E8.svg?logo=terraform"
     url   = "https://github.com/terraform-providers/terraform-provider-google/releases"
@@ -60,6 +52,7 @@ section {
       - `google_organization_iam_custom_role`
       - `google_project_iam_custom_role`
 
+      Creating an organizational custom role is mutual exclusive with creating a project custom role.
     END
   }
 
@@ -70,7 +63,7 @@ section {
 
       ```hcl
       module "terraform-google-iam-custom-role" {
-        source      = "git@github.com:mineiros-io/terraform-google-iam-custom-role.git?ref=v0.0.1"
+        source      = "github.com/mineiros-io/terraform-google-iam-custom-role?ref=v0.0.2"
 
         role_id     = "myCustomRole"
         title       = "My Custom Role"
@@ -93,7 +86,13 @@ section {
       title = "Main Resource Configuration"
 
       variable "role_id" {
-        description = "The camelCaseRoleId to use for this role. Cannot contain `-` characters."
+        description = <<-EOF
+          The camelCaseRoleId to use for this role.
+          Cannot contain `-` characters.
+          If the total number of `permissions` and imported permissions via `permissions_from` is larger than 3000
+          the module will split the role into multiple roles and append a `{num}of{max}` suffix to the `role_id`.
+          This can happen when roles with a large number of permissions is imported (e.g. `roles/editor`).
+        EOF
         type        = string
         required    = true
       }
@@ -104,50 +103,64 @@ section {
         required    = true
       }
 
-      variable "permissions" {
-        description = "The names of the permissions this role grants when bound in an IAM policy. At least one permission must be specified."
-        type        = set(string)
-        required    = true
-      }
-
       variable "org_id" {
-        description = "The numeric ID of the organization in which you want to create a custom role."
+        description = "The numeric ID of the organization in which you want to create a custom role. Conflicts with `var.project`."
         type        = string
+        default     = null
       }
 
-      variable "stage" {
+      variable "project" {
+        type        = string
         description = <<-EOF
-The current launch stage of the role.
-
-The possible values are:
-
- - `ALPHA`: The user has indicated this role is currently in an Alpha phase. If this launch stage is selected, the stage field will not be included when requesting the definition for a given role.
- - `BETA`: The user has indicated this role is currently in a Beta phase.
- - `GA`: The user has indicated this role is generally available.
- - `DEPRECATED`: The user has indicated this role is being deprecated.
- - `DISABLED`: This role is disabled and will not contribute permissions to any principals it is granted to in policies.
- - `EAP`: The user has indicated this role is currently in an EAP phase.
-EOF
-        type        = string
-        default     = "GA"
+          The project that the service account will be created in.
+          Ignored if `org_id` is set.
+          Defaults to the provider project configuration.
+        EOF
+        default     = null
       }
+
       variable "description" {
         description = "A human-readable description for the role."
         type        = string
       }
 
+      variable "permissions" {
+        description = <<-EOD
+          The names of the permissions this role grants when bound in an IAM policy.
+          will be merged with permission returned by `permissions_from_roles`.
+          in total at least one permission must be specified.
+        EOD
+        type     = set(string)
+        required = true
+      }
 
-      variable "projects" {
-        description = "A set of projects that the custom role will be created in."
-        type        = set(string)
+      variable "stage" {
+        description = <<-EOF
+          The current launch stage of the role.
+
+          The possible values are:
+
+          - `ALPHA`: The user has indicated this role is currently in an Alpha phase. If this launch stage is selected, the stage field will not be included when requesting the definition for a given role.
+          - `BETA`: The user has indicated this role is currently in a Beta phase.
+          - `GA`: The user has indicated this role is generally available.
+          - `DEPRECATED`: The user has indicated this role is being deprecated.
+          - `DISABLED`: This role is disabled and will not contribute permissions to any principals it is granted to in policies.
+          - `EAP`: The user has indicated this role is currently in an EAP phase.
+        EOF
+        type        = string
+        default     = "GA"
       }
     }
 
-    # section {
-    #   title = "Extended Resource Configuration"
-    #
-    #   # please uncomment and add extended resource variables here (resource not the main resource)
-    # }
+    section {
+      title = "Extended Resource Configuration"
+
+      variable "permissions_from_roles" {
+        description = "A set of role names of existing roles to have the permissions cloned from."
+        type        = set(string)
+        default     = []
+      }
+    }
 
     section {
       title = "Module Configuration"
@@ -194,13 +207,6 @@ EOF
       type        = bool
       description = "Whether this module is enabled."
     }
-
-    # output "module_tags" {
-    #   type        = map(string)
-    #   description = <<-END
-    #     The map of tags that are being applied to all created resources that accept tags.
-    #   END
-    # }
   }
 
   section {

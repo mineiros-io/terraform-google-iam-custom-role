@@ -42,8 +42,7 @@ module "test" {
   description = "A description"
   permissions = ["iam.roles.list", "iam.roles.create", "iam.roles.delete"]
 
-  org_id   = "1234567"
-  projects = ["foo", "bar", "baz"]
+  org_id = "1234567"
 }
 
 # outputs generate non-idempotent terraform plans so we disable them for now unless we need them.

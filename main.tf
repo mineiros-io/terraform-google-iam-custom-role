@@ -1,27 +1,35 @@
+locals {
+  permissions = setunion(var.permissions, local.permissions_from_roles)
+
+  permissions_chunks = chunklist(local.permissions, 3000)
+
+  number_of_chunks = length(local.permissions_chunks)
+}
+
 resource "google_organization_iam_custom_role" "role" {
-  count = var.module_enabled && var.org_id != null ? 1 : 0
-
-  depends_on = [var.module_depends_on]
-
-  stage       = var.stage
-  role_id     = var.role_id
-  title       = var.title
-  description = var.description
-  permissions = var.permissions
+  count = var.module_enabled && var.org_id != null ? local.number_of_chunks : 0
 
   org_id = var.org_id
+
+  stage       = var.stage
+  role_id     = local.number_of_chunks == 1 ? var.role_id : "${var.role_id}${count.index + 1}of${local.number_of_chunks}"
+  title       = var.title
+  description = var.description
+  permissions = local.permissions_chunks[count.index]
+
+  depends_on = [var.module_depends_on]
 }
 
 resource "google_project_iam_custom_role" "roles" {
-  for_each = var.module_enabled ? var.projects : []
+  count = var.module_enabled && var.org_id == null ? local.number_of_chunks : 0
 
-  depends_on = [var.module_depends_on]
+  project = var.project
 
   stage       = var.stage
-  role_id     = var.role_id
+  role_id     = local.number_of_chunks == 1 ? var.role_id : "${var.role_id}${count.index + 1}of${local.number_of_chunks}"
   title       = var.title
   description = var.description
-  permissions = var.permissions
+  permissions = local.permissions_chunks[count.index]
 
-  project = each.value
+  depends_on = [var.module_depends_on]
 }

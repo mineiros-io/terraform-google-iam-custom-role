@@ -19,6 +19,7 @@ This module is part of our Infrastructure as Code (IaC) framework that enables o
 - [Getting Started](#getting-started)
 - [Module Argument Reference](#module-argument-reference)
   - [Main Resource Configuration](#main-resource-configuration)
+  - [Extended Resource Configuration](#extended-resource-configuration)
   - [Module Configuration](#module-configuration)
 - [Module Outputs](#module-outputs)
 - [External Documentation](#external-documentation)
@@ -38,13 +39,15 @@ This module allows the management of customized Cloud IAM project and organizati
 - `google_organization_iam_custom_role`
 - `google_project_iam_custom_role`
 
+Creating an organizational custom role is mutual exclusive with creating a project custom role.
+
 ## Getting Started
 
 Most common usage of the module:
 
 ```hcl
 module "terraform-google-iam-custom-role" {
-  source      = "git@github.com:mineiros-io/terraform-google-iam-custom-role.git?ref=v0.0.1"
+  source      = "github.com/mineiros-io/terraform-google-iam-custom-role?ref=v0.0.2"
 
   role_id     = "myCustomRole"
   title       = "My Custom Role"
@@ -63,19 +66,39 @@ See [variables.tf] and [examples/] for details and use-cases.
 
 - [**`role_id`**](#var-role_id): *(**Required** `string`)*<a name="var-role_id"></a>
 
-  The camelCaseRoleId to use for this role. Cannot contain `-` characters.
+  The camelCaseRoleId to use for this role.
+  Cannot contain `-` characters.
+  If the total number of `permissions` and imported permissions via `permissions_from` is larger than 3000
+  the module will split the role into multiple roles and append a `{num}of{max}` suffix to the `role_id`.
+  This can happen when roles with a large number of permissions is imported (e.g. `roles/editor`).
 
 - [**`title`**](#var-title): *(**Required** `string`)*<a name="var-title"></a>
 
   A human-readable title for the role.
 
-- [**`permissions`**](#var-permissions): *(**Required** `set(string)`)*<a name="var-permissions"></a>
-
-  The names of the permissions this role grants when bound in an IAM policy. At least one permission must be specified.
-
 - [**`org_id`**](#var-org_id): *(Optional `string`)*<a name="var-org_id"></a>
 
-  The numeric ID of the organization in which you want to create a custom role.
+  The numeric ID of the organization in which you want to create a custom role. Conflicts with `var.project`.
+
+  Default is `null`.
+
+- [**`project`**](#var-project): *(Optional `string`)*<a name="var-project"></a>
+
+  The project that the service account will be created in.
+  Ignored if `org_id` is set.
+  Defaults to the provider project configuration.
+
+  Default is `null`.
+
+- [**`description`**](#var-description): *(Optional `string`)*<a name="var-description"></a>
+
+  A human-readable description for the role.
+
+- [**`permissions`**](#var-permissions): *(**Required** `set(string)`)*<a name="var-permissions"></a>
+
+  The names of the permissions this role grants when bound in an IAM policy.
+  will be merged with permission returned by `permissions_from_roles`.
+  in total at least one permission must be specified.
 
 - [**`stage`**](#var-stage): *(Optional `string`)*<a name="var-stage"></a>
 
@@ -83,22 +106,22 @@ See [variables.tf] and [examples/] for details and use-cases.
 
   The possible values are:
 
-   - `ALPHA`: The user has indicated this role is currently in an Alpha phase. If this launch stage is selected, the stage field will not be included when requesting the definition for a given role.
-   - `BETA`: The user has indicated this role is currently in a Beta phase.
-   - `GA`: The user has indicated this role is generally available.
-   - `DEPRECATED`: The user has indicated this role is being deprecated.
-   - `DISABLED`: This role is disabled and will not contribute permissions to any principals it is granted to in policies.
-   - `EAP`: The user has indicated this role is currently in an EAP phase.
+  - `ALPHA`: The user has indicated this role is currently in an Alpha phase. If this launch stage is selected, the stage field will not be included when requesting the definition for a given role.
+  - `BETA`: The user has indicated this role is currently in a Beta phase.
+  - `GA`: The user has indicated this role is generally available.
+  - `DEPRECATED`: The user has indicated this role is being deprecated.
+  - `DISABLED`: This role is disabled and will not contribute permissions to any principals it is granted to in policies.
+  - `EAP`: The user has indicated this role is currently in an EAP phase.
 
   Default is `"GA"`.
 
-- [**`description`**](#var-description): *(Optional `string`)*<a name="var-description"></a>
+### Extended Resource Configuration
 
-  A human-readable description for the role.
+- [**`permissions_from_roles`**](#var-permissions_from_roles): *(Optional `set(string)`)*<a name="var-permissions_from_roles"></a>
 
-- [**`projects`**](#var-projects): *(Optional `set(string)`)*<a name="var-projects"></a>
+  A set of role names of existing roles to have the permissions cloned from.
 
-  A set of projects that the custom role will be created in.
+  Default is `[]`.
 
 ### Module Configuration
 
