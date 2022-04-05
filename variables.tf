@@ -65,6 +65,12 @@ variable "permissions_from_roles" {
   default     = []
 }
 
+variable "exclude_permissions" {
+  type        = set(string)
+  description = "(Optional) The names of the permissions to be excluded from the cloned permissions."
+  default     = []
+}
+
 # ----------------------------------------------------------------------------------------------------------------------
 # MODULE CONFIGURATION PARAMETERS
 # These variables are used to configure the module.

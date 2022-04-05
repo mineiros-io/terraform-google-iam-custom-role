@@ -160,6 +160,12 @@ section {
         type        = set(string)
         default     = []
       }
+
+      variable "exclude_permissions" {
+        description = "A set of permissions to be excluded from the cloned permissions."
+        type        = set(string)
+        default     = []
+      }
     }
 
     section {
