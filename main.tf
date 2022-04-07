@@ -1,7 +1,7 @@
 locals {
   permissions = setunion(var.permissions, local.permissions_from_roles)
 
-  permissions_chunks = chunklist(local.permissions, 3000)
+  permissions_chunks = chunklist(local.permissions, var.permissions_chunk_size)
 
   number_of_chunks = length(local.permissions_chunks)
 }
