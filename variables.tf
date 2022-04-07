@@ -65,6 +65,12 @@ variable "permissions_from_roles" {
   default     = []
 }
 
+variable "permissions_chunk_size" {
+  type        = number
+  description = "(Optional) The maximum count of permissions chunk to split the cloned list with."
+  default     = 3000
+}
+
 variable "exclude_permissions" {
   type        = set(string)
   description = "(Optional) The names of the permissions to be excluded from the cloned permissions."

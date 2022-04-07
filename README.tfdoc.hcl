@@ -155,14 +155,20 @@ section {
     section {
       title = "Extended Resource Configuration"
 
-      variable "permissions_from_roles" {
-        description = "A set of role names of existing roles to have the permissions cloned from."
+      variable "exclude_permissions" {
+        description = "A set of permissions to be excluded from the cloned permissions."
         type        = set(string)
         default     = []
       }
 
-      variable "exclude_permissions" {
-        description = "A set of permissions to be excluded from the cloned permissions."
+      variable "permissions_chunk_size" {
+        type        = number
+        description = "The maximum size of permissions chunk to split the cloned list with."
+        default     = 3000
+      }
+
+      variable "permissions_from_roles" {
+        description = "A set of role names of existing roles to have the permissions cloned from."
         type        = set(string)
         default     = []
       }
