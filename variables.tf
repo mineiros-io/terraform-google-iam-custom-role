@@ -5,7 +5,12 @@
 
 variable "role_id" {
   type        = string
-  description = "(Required) The camel case role id to use for this role. Cannot contain - characters."
+  description = "(Required) The camel case role id to use for this role. Can only contain alphanumeric characters."
+
+  validation {
+    condition     = can(regex("^[a-z](([a-z0-9]+[A-Z]?)*)$", var.role_id))
+    error_message = "The id of the role can only contain alphanumeric characters, must start with a lowercase letter or number and be defined in camel case."
+  }
 }
 
 variable "title" {
