@@ -9,7 +9,7 @@ variable "role_id" {
 
   validation {
     condition     = can(regex("^[a-z](([a-z0-9]+[A-Z]?)*)$", var.role_id))
-    error_message = "The id of the role can only contain characters and numbers, must start with a character and be defined in camel case."
+    error_message = "The id of the role can only contain alphanumeric characters, must start with a lowercase letter or number and be defined in camel case."
   }
 }
 
