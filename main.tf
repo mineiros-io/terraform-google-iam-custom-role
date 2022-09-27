@@ -6,7 +6,7 @@ locals {
   number_of_chunks = length(local.permissions_chunks)
 }
 
-resource "google_organization_iam_custom_role" "role" {
+resource "google_organization_iam_custom_role" "roles" {
   count = var.module_enabled && var.org_id != null ? local.number_of_chunks : 0
 
   org_id = var.org_id
@@ -32,4 +32,9 @@ resource "google_project_iam_custom_role" "roles" {
   permissions = local.permissions_chunks[count.index]
 
   depends_on = [var.module_depends_on]
+}
+
+moved {
+  from = google_organization_iam_custom_role.role
+  to   = google_organization_iam_custom_role.roles
 }
