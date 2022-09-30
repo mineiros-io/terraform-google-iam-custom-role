@@ -117,6 +117,18 @@ See [variables.tf] and [examples/] for details and use-cases.
 
 ### Extended Resource Configuration
 
+- [**`exclude_permissions`**](#var-exclude_permissions): *(Optional `set(string)`)*<a name="var-exclude_permissions"></a>
+
+  A set of permissions to be excluded from the cloned permissions.
+
+  Default is `[]`.
+
+- [**`permissions_chunk_size`**](#var-permissions_chunk_size): *(Optional `number`)*<a name="var-permissions_chunk_size"></a>
+
+  The maximum size of permissions chunk to split the cloned list with.
+
+  Default is `3000`.
+
 - [**`permissions_from_roles`**](#var-permissions_from_roles): *(Optional `set(string)`)*<a name="var-permissions_from_roles"></a>
 
   A set of role names of existing roles to have the permissions cloned from.
@@ -152,11 +164,11 @@ The following attributes are exported in the outputs of the module:
 
 - [**`google_project_iam_custom_roles`**](#output-google_project_iam_custom_roles): *(`list(google_project_iam_custom_role)`)*<a name="output-google_project_iam_custom_roles"></a>
 
-  A map of outputs of the created google_project_iam_custom_role resources.
+  The list of google_project_iam_custom_role resources.
 
-- [**`google_organization_iam_custom_role`**](#output-google_organization_iam_custom_role): *(`object(google_organization_iam_custom_role)`)*<a name="output-google_organization_iam_custom_role"></a>
+- [**`google_organization_iam_custom_roles`**](#output-google_organization_iam_custom_roles): *(`list(google_organization_iam_custom_role)`)*<a name="output-google_organization_iam_custom_roles"></a>
 
-  A map of outputs of the created google_organization_iam_custom_role resource.
+  The list of google_organization_iam_custom_role resources.
 
 - [**`module_enabled`**](#output-module_enabled): *(`bool`)*<a name="output-module_enabled"></a>
 

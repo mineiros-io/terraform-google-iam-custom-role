@@ -130,8 +130,8 @@ section {
           will be merged with permission returned by `permissions_from_roles`.
           in total at least one permission must be specified.
         EOD
-        type     = set(string)
-        required = true
+        type        = set(string)
+        required    = true
       }
 
       variable "stage" {
@@ -207,12 +207,12 @@ section {
 
     output "google_project_iam_custom_roles" {
       type        = list(google_project_iam_custom_role)
-      description = "A map of outputs of the created google_project_iam_custom_role resources."
+      description = "The list of google_project_iam_custom_role resources."
     }
 
-    output "google_organization_iam_custom_role" {
-      type        = object(google_organization_iam_custom_role)
-      description = "A map of outputs of the created google_organization_iam_custom_role resource."
+    output "google_organization_iam_custom_roles" {
+      type        = list(google_organization_iam_custom_role)
+      description = "The list of google_organization_iam_custom_role resources."
     }
 
     output "module_enabled" {
