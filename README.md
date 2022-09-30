@@ -170,10 +170,6 @@ The following attributes are exported in the outputs of the module:
 
   The list of google_organization_iam_custom_role resources.
 
-- [**`module_enabled`**](#output-module_enabled): *(`bool`)*<a name="output-module_enabled"></a>
-
-  Whether this module is enabled.
-
 ## External Documentation
 
 ### Google Cloud Documentation:
