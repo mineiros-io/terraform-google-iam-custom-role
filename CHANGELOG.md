@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - BREAKING CHANGE: output `google_project_iam_custom_role` -> `google_project_iam_custom_roles`
 - BREAKING CHANGE: output `google_organization_iam_custom_role` -> `google_organization_iam_custom_roles` and returns list of resources instead of the first object.
 
+### Removed
+
+- BREAKING CHANGE: remove output `module_enabled`
+
 ## [0.0.2]
 
 ### Added
