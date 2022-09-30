@@ -214,11 +214,6 @@ section {
       type        = list(google_organization_iam_custom_role)
       description = "The list of google_organization_iam_custom_role resources."
     }
-
-    output "module_enabled" {
-      type        = bool
-      description = "Whether this module is enabled."
-    }
   }
 
   section {
