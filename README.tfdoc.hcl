@@ -39,7 +39,7 @@ section {
   content = <<-END
     A [Terraform][terraform] module to create [Google Project IAM custom role][google-project-iam-custom-roles] and [Google Organization IAM custom role][google-organization-iam-custom-role] on [Google Cloud Services (GCP)][gcp].
 
-    **_This module supports Terraform version 1 and is compatible with the Terraform Google Provider version 4._**
+    **_This module supports Terraform version 1 and is compatible with the Terraform Google Provider version 4._** and 5._**
 
     This module is part of our Infrastructure as Code (IaC) framework that enables our users and customers to easily deploy and manage reusable secure, and production-grade cloud infrastructure.
   END
